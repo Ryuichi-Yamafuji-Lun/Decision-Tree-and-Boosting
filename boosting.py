@@ -21,14 +21,54 @@ class AdaBoost:
     
     # Hint 1: remember to convert labels from {0,1} to {-1,1}
     # Hint 2: DecisionTreeClassifier supports fitting with a weighted training set
-        
+
+    # gets shape of X
+    samples = X.shape[0]
+
+    # initialize sample weights
+    w = np.full(samples, 1/samples )
+
+    # convert labels 
+    new_y = np.where(y == 0, -1, 1)
+
+    for _ in range(self.n_estimators):
+
+      # obtain a weak classifier
+      model = DecisionTreeClassifier(max_depth=self.max_depth)
+      model.fit(X, y, sample_weight=w)
+      h_t = model.predict(X)
+      h_t= np.where(h_t == 0, -1, 1)
+
+      # calculate importance of h
+      # weighted error epsilon
+      error = (h_t != new_y)
+      e = np.sum(w[error])
+      # beta
+      beta = 0.5 * np.log((1 - e)/ e)
+
+      # update distributions
+      w *= np.exp(-beta * new_y * h_t)
+
+      w /= np.sum(w)
+
+      self.models.append(model)
+      self.betas.append(beta)
+    
     return self
     
   def predict(self, X):
     ###########################TODO#############################################
     # In this part, make prediction on X using the learned ensemble
     # Note that the prediction needs to be binary, that is, 0 or 1.
+    final_prediction = np.zeros(X.shape[0])
+
+    for t in range(self.n_estimators):
+      model, beta = self.models[t], self.betas[t]
+      h_t = model.predict(X)
+      h_t = np.where(h_t == 0, -1, 1)
+      final_prediction += beta * h_t
     
+    preds = np.where(final_prediction > 0, 1, 0)
     return preds
     
   def score(self, X, y):

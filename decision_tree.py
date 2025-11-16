@@ -34,15 +34,15 @@ def train_model(X_train, t_train, max_depth = 10, min_samples_leaf = 10, criteri
   '''
   #Decision Tree: TODO (call tree.DecisionTreeClassifier with appropriate parameters)
   if model_type == 'DT':
-    model = None
+    model = tree.DecisionTreeClassifier(criterion=criterion, max_depth=max_depth, min_samples_leaf=min_samples_leaf, max_features=max_features, random_state=seed)
   
   #Random Forest: TODO (call RandomForestClassifier with appropriate parameters)
   elif model_type == 'RF':
-    model = None
+    model = RandomForestClassifier(n_estimators=n_estimators, criterion=criterion, max_depth=max_depth, min_samples_leaf=min_samples_leaf, max_samples=max_samples, max_features=max_features, random_state=seed)
     
   #AdaBoost with Decition Tree: TODO (call AdaBoost from boosting.py with appropriate parameters)
   elif model_type == 'AdaBoost':
-    model = None
+    model = AdaBoost( n_estimators=n_estimators, max_depth=max_depth )
   
   model = model.fit(X_train, t_train)
   return model
